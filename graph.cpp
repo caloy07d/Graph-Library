@@ -6,6 +6,8 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <unordered_map>
+
 using namespace std;
 
 class Graph {
@@ -15,6 +17,12 @@ class Graph {
         bool directed = false;
         bool weighted = false;
         vector<vector<vector<int>>> edgeWeight;
+
+        struct CompareSecond {
+            bool operator () (const pair<int,int>& a, const pair<int,int>& b) {
+                return a.second > b.second;
+            }
+        };
         
 
         Graph(int n) {
@@ -153,6 +161,37 @@ class Graph {
             for (auto n : res) {
                 cout << n << " ";
             }
+        }
+
+        vector<int> Djikstra(int src) {
+            priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> pq;
+            vector<bool> visited(size, false);
+            vector<int> dist(size, INT_MAX);
+        
+            pq.push({0, src});
+            dist[src] = 0;
+        
+            while (!pq.empty()) {
+                int currDist = pq.top()[0];
+                int currentNode = pq.top()[1];
+                pq.pop();
+        
+                if (!visited[currentNode]) {
+                    visited[currentNode] = true;
+            
+                    for (int neighbor : G[currentNode]) {
+                        int weight = edgeWeight[currentNode][neighbor][0];
+                        
+                        if (!visited[neighbor] && dist[neighbor] > dist[currentNode] + weight) {
+                            dist[neighbor] = dist[currentNode] + weight;
+                            pq.push({dist[neighbor], neighbor});
+                        }
+                    }
+                }
+            
+            }
+        
+            return dist;
         }
 
       
